@@ -24,7 +24,8 @@ export default function GitHubStars() {
   const [loading, setLoading] = useState(false);
   const [cid, setCid] = useState("");
   const [txid, setTxid] = useState("");
-  const [transaction, setTransaction] = useState();
+  const [transactions, setTransactions] = useState();
+  
   const [categories, setCategories] = useState([
     {
       title: "Stars",
@@ -51,6 +52,8 @@ export default function GitHubStars() {
   ]);
   const [error, setError] = useState(false);
   const [log, setLog] = useState();
+
+  const columnheaders = ['TransactionID', 'To', 'From', 'Value', 'Time'];
 
   // Trigger Github API selection 
   const fetchStars = async () => {
@@ -119,7 +122,7 @@ export default function GitHubStars() {
     console.log("checkTransaction:", txid)
     try {
       const contractInfo = await getContractTransactions(txid);
-      setTransaction(contractInfo);
+      setTransactions(contractInfo);
     } catch (error) {
       //@ts-ignore
       console.log("contract error", error.message);
@@ -142,7 +145,7 @@ export default function GitHubStars() {
               value={txid}
               className="border border-[#b4aad0] max-w-[150px]"
               
-              // CHANGE THIS TO CALL ETHERSCAN API
+              // Call Etherscan API
               onChange={(e) =>
                 setTxid(e.target.value)
               }
@@ -162,8 +165,32 @@ export default function GitHubStars() {
           "Check if exists"
         )}
       </button>
-      {transaction? JSON.stringify(transaction):"no transaction"}
       </div>
+      {transactions ? (
+        <>
+          <table>
+          <thead>
+            <tr>
+              {columnheaders.map((header) => (
+                <th key={header}>{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((transaction) => (
+            <tr key={transaction.transactionID}>
+              <td>{transaction.transactionID}</td>
+              <td>{transaction.to}</td>
+              <td>{transaction.from}</td>
+              <td>{transaction.value}</td>
+              <td>{transaction.time}</td>
+            </tr>
+          ))}
+          </tbody>
+          </table>
+        </>
+      ) :"no transaction"}
+      
       <div className="border-b-4 border-dashed border-[#9cf] my-3"></div>
       <div className="details__box !mx-auto !mt-20">
         <div className="mt-3 mb-1">Github Repo</div>
