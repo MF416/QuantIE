@@ -13,7 +13,7 @@ export default function Home() {
       </Head>
       <div className="nav shadow-md shadow-gray-400">
         <div className="nav-item">
-          <Link href="/">IE</Link>
+          <Link href="/">Quantitative Impact Evaluator Tool</Link>
         </div>
       </div>
       <main className="flex flex-col items-center justify-center w-full px-20 text-center">
