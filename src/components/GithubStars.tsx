@@ -5,6 +5,29 @@ import { eventListener } from "../scripts/eventListener";
 import { rewardTransaction } from "../scripts/rewardTransaction";
 import { getContractTransactions } from "../scripts/verifyContract";
 
+interface TransactionDetail {
+  blockNumber: string;
+  timeStamp: string;
+  hash: string;
+  nonce: string;
+  blockHash: string;
+  transactionIndex: string;
+  from: string;
+  to: string;
+  value: string;
+  gas: string;
+  gasPrice: string;
+  isError: string;
+  txreceipt_status: string;
+  input: string;
+  contractAddress: string;
+  cumulativeGasUsed: string;
+  gasUsed: string;
+  confirmations: string;
+  methodId: string;
+  functionName: string;
+}
+
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 const projectSecret = process.env.NEXT_PUBLIC_API_KEY;
 const auth =
@@ -24,8 +47,8 @@ export default function GitHubStars() {
   const [loading, setLoading] = useState(false);
   const [cid, setCid] = useState("");
   const [txid, setTxid] = useState("");
-  const [transactions, setTransactions] = useState();
-  
+  const [transactions, setTransactions] = useState<TransactionDetail[] | undefined>();
+
   const [categories, setCategories] = useState([
     {
       title: "Stars",
@@ -96,7 +119,7 @@ export default function GitHubStars() {
         setLoading(false);
       });
   };
- 
+
   // Pin File to IPFS via infura node
   const pinFile = async (file: any) => {
     try {
@@ -117,18 +140,19 @@ export default function GitHubStars() {
   };
 
   // Ping etherscan to verify if contract exists
-  const checkTransaction = async (txid:string) => {
-    
+  const checkTransaction = async (txid: string) => {
+
     console.log("checkTransaction:", txid)
     try {
       const contractInfo = await getContractTransactions(txid);
       setTransactions(contractInfo);
+      console.log('contractInfo', contractInfo)
     } catch (error) {
       //@ts-ignore
       console.log("contract error", error.message);
       setLoading(false);
     }
-    
+
   }
 
   return (
@@ -136,7 +160,7 @@ export default function GitHubStars() {
       {/* <button onClick={() => eventListener()}>listen</button>
       <button onClick={() => rewardTransaction()}>rewardTransaction</button> */}
       <div className="details__box !mx-auto !mt-20">
-      <div className="mt-3 mb-1">IE Contract Validation</div>
+        <div className="mt-3 mb-1">IE Contract Validation</div>
         <div className="mx-10">
           <div className="flex items-center justify-between mb-1">
             <div className="font-normal">Contract address</div>
@@ -144,55 +168,55 @@ export default function GitHubStars() {
               type="text"
               value={txid}
               className="border border-[#b4aad0] max-w-[150px]"
-              
+
               // Call Etherscan API
               onChange={(e) =>
                 setTxid(e.target.value)
               }
             />
           </div>
+        </div>
+        <button
+          className="relative button__box mx-auto my-4"
+          onClick={() => checkTransaction(txid)}
+        >
+          {loading ? (
+            <>
+              <div className="absolute left-5 top-[6px] w-5 h-5 border-b-2 border-[#b4aad0] rounded-full animate-spin"></div>
+              Calculating
+            </>
+          ) : (
+            "Check if exists"
+          )}
+        </button>
       </div>
-      <button
-        className="relative button__box mx-auto mt-20"
-        onClick={() => checkTransaction(txid)}
-      >
-        {loading ? (
-          <>
-            <div className="absolute left-5 top-[6px] w-5 h-5 border-b-2 border-[#b4aad0] rounded-full animate-spin"></div>
-            Calculating
-          </>
-        ) : (
-          "Check if exists"
-        )}
-      </button>
-      </div>
-      {transactions ? (
+      {transactions && transactions.length > 0 && 
         <>
           <table>
-          <thead>
-            <tr>
-              {columnheaders.map((header) => (
-                <th key={header}>{header}</th>
+          <thead className="border-b-4 border-dashed border-[#9cf]">
+            <tr className="grid grid-cols-5 gap-4">
+                {columnheaders.map((header) => (
+                  <th key={header}>{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((transaction) => (
+                <tr className="grid grid-cols-5 gap-4" key={transaction.blockHash}>
+                  <td>{transaction.blockHash.substring(0,10)}</td>
+                  <td>{transaction.to.substring(0,10)}</td>
+                  <td>{transaction.from.substring(0,10)}</td>
+                  <td>{transaction.value}</td>
+                  <td>{transaction.timeStamp}</td>
+                </tr>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((transaction) => (
-            <tr key={transaction.transactionID}>
-              <td>{transaction.transactionID}</td>
-              <td>{transaction.to}</td>
-              <td>{transaction.from}</td>
-              <td>{transaction.value}</td>
-              <td>{transaction.time}</td>
-            </tr>
-          ))}
-          </tbody>
+            </tbody>
           </table>
-        </>
-      ) :"no transaction"}
+          </>
+      }
+
       
-      <div className="border-b-4 border-dashed border-[#9cf] my-3"></div>
-      <div className="details__box !mx-auto !mt-20">
+      <div className="details__box !mx-auto !mt-10">
         <div className="mt-3 mb-1">Github Repo</div>
         <div className="mx-10">
           <div className="flex items-center justify-between mb-1">
