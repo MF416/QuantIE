@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Captures existing contracts connected to the Impact Evaluator
+model Contract {
+  id        Int  @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  address   String  @unique
+  name      String
+  transactions Transaction[]
+}
+
+// Captures the projects that have submitted to the Impact Evaluator
+model Project {
+  id        Int  @id @default(autoincrement()) 
+  createdAt DateTime @default(now())
+  address   String  @unique
+  // name      String
+  transactions Transaction[]
+}
+
+
+// Combine event capture and submission to complete a single transaction
+model Transaction {
+  txID String @id @unique
+  // rewardee String 
+  impactCID String
+  value Float
+
+  // Linking to a Contract
+  contract   Contract @relation(fields: [contractId], references: [address])
+  contractId String // change to address?
+
+  // Linking to a Project
+  project    Project @relation(fields: [projectId], references: [address])
+  projectId  String // change to address?
+
+  // Ensure that each Transaction is linked to either a Contract or a Project
+  // @@unique([contractId, projectId])
+
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
