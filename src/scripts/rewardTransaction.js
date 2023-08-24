@@ -54,7 +54,7 @@ export async function rewardTransaction(txCID) {
   // API call to send new transaction to Prisma DB
   const requestData = {
     txID: tx.hash,
-    rewardee: "laurent",
+    // rewardee: "laurent",
     impactCID: txCID,
     value: 0.00005,
     contractId: tx.to,
