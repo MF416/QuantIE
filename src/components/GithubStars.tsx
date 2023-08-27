@@ -97,6 +97,7 @@ export default function GitHubStars() {
         }, 0);
 
         const file = {
+          
           metrics: categories.map((item) => {
             return {
               name: item.name,
