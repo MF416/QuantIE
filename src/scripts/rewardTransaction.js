@@ -61,7 +61,7 @@ export async function rewardTransaction(txCID) {
     projectId: claimAddress,
   };
 
-  const apiUrl = "http://https://quant-ie.vercel.app//api/txPost";
+  const apiUrl = "https://quant-ie.vercel.app/api/txPost";
 
   try {
     const response = await fetch(apiUrl, {
